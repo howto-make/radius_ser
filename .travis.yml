@@ -1,0 +1,30 @@
+# travis.yml
+
+sudo: required
+services:
+  - docker
+
+env:
+  - COMPOSE_VERSION=1.23.1
+
+before_install:
+  - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - docker-compose --version
+
+install:
+  - docker build --pull --no-cache -t 2stacks/freeradius .
+
+# Assist with ci test debugging:
+#  - DEBUG=1
+
+before_script:
+  - image="2stacks/freeradius"
+  - docker inspect "$image"
+
+script: ./scripts/run-tests.sh
+
+notifications:
+  email:
+    - 2stacks@2stacks.net
